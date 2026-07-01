@@ -15,7 +15,7 @@ import Footer from './components/Footer'
 import SearchBar from './components/SearchBar'
 import { ToastContainer,toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import Verify from './pages/Verify'
+// import Verify from './pages/Verify'
 
 import PrivacyPolicy from './pages/Privacy_Policy'
 import ShippingPolicy from './pages/Shipping_Policy'
@@ -61,7 +61,7 @@ useEffect(() => {
         <Route path='/place-order' element={<PlaceOrder/>} />
         <Route path='/orders' element={<Orders/>} />
         <Route path='/careers' element={<Career />} />
-        <Route path='/verify' element={<Verify />} />
+        {/* <Route path='/verify' element={<Verify />} /> */}
         <Route path='/privacy-policy' element={<PrivacyPolicy/>}/>
         
         <Route path='/shipping-delivery-policy' element={<ShippingPolicy/>}/>
