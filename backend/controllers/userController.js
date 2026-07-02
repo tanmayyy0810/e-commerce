@@ -5,89 +5,111 @@ import validator from "validator";
 
 
 
-const createToken=(id)=> {
-    return jwt.sign({id},process.env.JWT_SECRET)
+const createToken = (id) => {
+    return jwt.sign({ id }, process.env.JWT_SECRET)
 }
 //route for user login
-const loginUser = async(req,res)=>{
-    try{
-        const {email,password}=req.body;
-        const user=await userModel.findOne({email});
-        if(!user){
-            return res.json({success:false,message:" User does not Exist"})
+const loginUser = async (req, res) => {
+    try {
+        const { email, password } = req.body;
+        const user = await userModel.findOne({ email });
+        if (!user) {
+            return res.json({ success: false, message: " User does not Exist" })
         }
-        const isMatch=await bcrypt.compare(password,user.password);
-        if(isMatch){
-            const token=createToken(user._id)
-            res.json({success:true,token})
-        }else{
-            res.json({success:false,message:'Invalid credentials'})
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (isMatch) {
+            const token = createToken(user._id)
+            res.json({ success: true, token })
+        } else {
+            res.json({ success: false, message: 'Invalid credentials' })
         }
 
-    }catch(error){
+    } catch (error) {
         console.log(error);
-        res.json({success:false, message:error.message})
+        res.json({ success: false, message: error.message })
 
     }
-    
+
 
 }
 
 // route for user register
-const registerUser=async(req,res)=>{
-    try{
-        const {name, email, password}=req.body;
+const registerUser = async (req, res) => {
+    try {
+        const { name, email, password } = req.body;
         //checking user alr exists or not
-        const exists=await userModel.findOne({email})
-        if(exists){
-            return res.json({success:false,message:" User Already Exists"})
+        const exists = await userModel.findOne({ email })
+        if (exists) {
+            return res.json({ success: false, message: " User Already Exists" })
         }
         // validating email and strng pw
-        if(!validator.isEmail(email)){
-            return res.json({success:false,message:" Please enter a valid email"})
+        if (!validator.isEmail(email)) {
+            return res.json({ success: false, message: " Please enter a valid email" })
 
         }
-        if(password.length<8){
-            return res.json({success:false,message:"Please Enter a strong password"})
+        if (password.length < 8) {
+            return res.json({ success: false, message: "Please Enter a strong password" })
         }
         //hashing user pw
 
-        const salt=await bcrypt.genSalt(10)
-        const hashedPassword=await bcrypt.hash(password,salt)
+        const salt = await bcrypt.genSalt(10)
+        const hashedPassword = await bcrypt.hash(password, salt)
 
-        const newUser=new userModel({
+        const newUser = new userModel({
 
-            name,email,
-            password:hashedPassword
+            name, email,
+            password: hashedPassword
         })
-        const user=await newUser.save()
-        const token= createToken(user._id)
+        const user = await newUser.save()
+        const token = createToken(user._id)
 
-        res.json({success:true, token })
+        res.json({ success: true, token })
 
 
-    }catch(error){
+    } catch (error) {
         console.log(error);
-        res.json({success:false, message:error.message})
+        res.json({ success: false, message: error.message })
 
     }
 
 }
 
 //route for admin login
-const adminLogin=async(req,res)=>{
+const adminLogin = async (req, res) => {
     try {
-        const {email,password}=req.body
-        if(email===process.env.ADMIN_EMAIL && password=== process.env.ADMIN_PASSWORD){
+        const { email, password } = req.body
+        if (email === process.env.ADMIN_EMAIL && password === process.env.ADMIN_PASSWORD) {
             const token=jwt.sign(email+password,process.env.JWT_SECRET);
-            res.json({success:true,token})
-        }else{
-            res.json({success:false,message:"Invalid Credentials"})
+            
+            res.json({ success: true, token })
+        } else {
+            res.json({ success: false, message: "Invalid Credentials" })
         }
     } catch (error) {
         console.log(error);
-        res.json({success:false, message:error.message})
-        
+        res.json({ success: false, message: error.message })
+
+    }
+
+
+}
+
+
+//route for Delivery login
+const deliveryLogin = async (req, res) => {
+    try {
+        const { email, password } = req.body
+        if (email === process.env.DELIVERY_EMAIL && password === process.env.DELIVERY_PASSWORD) {
+            const token=jwt.sign(email+password,process.env.JWT_SECRET);
+            
+            res.json({ success: true, token })
+        } else {
+            res.json({ success: false, message: "Invalid Credentials" })
+        }
+    } catch (error) {
+        console.log(error);
+        res.json({ success: false, message: error.message })
+
     }
 
 
@@ -119,4 +141,4 @@ const getProfile = async (req, res) => {
     }
 };
 
-export {loginUser, registerUser, adminLogin, getProfile}
+export { loginUser, registerUser, adminLogin, getProfile , deliveryLogin }

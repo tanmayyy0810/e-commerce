@@ -26,6 +26,8 @@ app.use("/api/career", careerRouter);
 app.use("/api/newsletter", newsletterRouter);
 
 
+
+
 app.get('/',(req,res)=>{
     res.send("API WORKING")
 })

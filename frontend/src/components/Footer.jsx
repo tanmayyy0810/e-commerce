@@ -63,7 +63,7 @@ const Footer = () => {
 
                         
                         <a
-                            href="https://instagram.com/tajfresh.india"
+                            href="https://www.facebook.com/profile.php?id=61591334710369"
                             target="_blank"
                             rel="noopener noreferrer"
                             className="text-gray-600 hover:opacity-80 transition-colors"

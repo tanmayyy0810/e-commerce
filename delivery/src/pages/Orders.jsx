@@ -14,7 +14,7 @@ const Orders = ({ token }) => {
       return null
     }
     try {
-      const response = await axios.post(backendUrl + '/api/order/list', {}, { headers: { token } })
+      const response = await axios.post(backendUrl + '/api/order/delivery-list', {}, { headers: { token } })
       if (response.data.success) {
         setOrders(response.data.orders)
       } else {
@@ -52,7 +52,7 @@ const Orders = ({ token }) => {
 
   return (
     <div>
-      <h2 className="text-2xl font-semibold mb-6">Order Page </h2>
+      <h3>Order Page </h3>
       <div>
         {
           orders.map((order, index) => (

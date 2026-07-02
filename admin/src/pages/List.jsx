@@ -49,7 +49,7 @@ const List = ({token}) => {
     },[])
   return (
     <>
-    <p className='mb-2'>All Products List </p>
+    <h2 className="text-2xl font-semibold mb-6">All Products List</h2>
     <div className='flex flex-col gap-2'>
         {/* {*list table title */}
 

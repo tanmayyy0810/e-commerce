@@ -6,6 +6,7 @@ const userSchema=new mongoose.Schema({
     cartData: {type: Object, default:{}},
     // resetOtp: {type: String, default: "" },
     // resetOtpExpireAt: {type: Number,default: 0}
+    
 },{minimize:false})
 
 
