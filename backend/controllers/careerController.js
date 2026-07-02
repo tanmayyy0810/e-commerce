@@ -1,6 +1,8 @@
 import careerModel from "../models/careerModel.js";
 import { v2 as cloudinary } from "cloudinary";
 import axios from "axios";
+import sendTelegramMessage from "../utils/telegram.js";
+import { careerNotification } from "../utils/telegramTemplates.js";
 
 const submitApplication = async(req,res)=>{
     try{
@@ -42,6 +44,9 @@ const submitApplication = async(req,res)=>{
         const application = new careerModel(applicationData);
 
         await application.save();
+        await sendTelegramMessage(
+    careerNotification(application)
+);
 
         res.json({
 

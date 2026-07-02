@@ -6,6 +6,8 @@ import Stripe from "stripe"
 import Razorpay from "razorpay";
 import { response } from "express";
 import transporter from "../config/mail.js";
+import sendTelegramMessage from "../utils/telegram.js";
+import { orderNotification } from "../utils/telegramTemplates.js";
 
 
 //global variables
@@ -43,6 +45,7 @@ const placeOrder = async (req, res) => {
 
         const newOrder = new orderModel(orderData)
         await newOrder.save()
+        await sendTelegramMessage(orderNotification(newOrder));
         try {
     await transporter.sendMail({
         from: process.env.EMAIL_USER,

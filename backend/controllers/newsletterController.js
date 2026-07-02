@@ -1,4 +1,6 @@
 import newsletterModel from "../models/newsletterModel.js";
+import sendTelegramMessage from "../utils/telegram.js";
+import { subscriberNotification } from "../utils/telegramTemplates.js";
 
 // Subscribe to newsletter
 
@@ -33,6 +35,7 @@ const subscribeNewsletter = async (req, res) => {
         });
 
         await subscriber.save();
+        await sendTelegramMessage(subscriberNotification(subscriber));
 
         res.json({
             success: true,
