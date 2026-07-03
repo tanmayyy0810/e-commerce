@@ -49,11 +49,17 @@ const placeOrder = async (req, res) => {
 
         console.log("EMAIL_USER =", process.env.EMAIL_USER);
         try {
-              console.log("Trying to connect to Gmail SMTP...");
+              console.log("Trying to connect to Brevo SMTP...");
 
+try {
     await transporter.verify();
+    console.log("Brevo SMTP Verified");
+} catch (err) {
+    console.log("Brevo Verify Error:", err);
+}
 
     console.log("SMTP Verified Successfully");
+    
     transporter.sendMail({
         from: process.env.EMAIL_USER,
         to: address.email,
