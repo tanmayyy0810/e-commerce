@@ -5,7 +5,7 @@ import Stripe from "stripe"
 // import razorpay from 'razorpay'
 import Razorpay from "razorpay";
 import { response } from "express";
-import transporter from "../config/mail.js";
+import { sendMail } from "../config/mail.js";
 import sendTelegramMessage from "../utils/telegram.js";
 import { orderNotification } from "../utils/telegramTemplates.js";
 
@@ -46,22 +46,7 @@ const placeOrder = async (req, res) => {
         const newOrder = new orderModel(orderData)
         await newOrder.save()
         await sendTelegramMessage(orderNotification(newOrder));
-
-        console.log("EMAIL_USER =", process.env.EMAIL_USER);
-        try {
-              console.log("Trying to connect to Brevo SMTP...");
-
-try {
-    await transporter.verify();
-    console.log("Brevo SMTP Verified");
-} catch (err) {
-    console.log("Brevo Verify Error:", err);
-}
-
-    console.log("SMTP Verified Successfully");
-    
-    transporter.sendMail({
-        from: process.env.EMAIL_USER,
+        sendMail({
         to: address.email,
         subject: "Order Confirmation | Shri Balaji Foods",
         html: `
@@ -367,12 +352,12 @@ We look forward to serving you again!
 </body>
 </html>
 `
+    }).then(() => {
+        console.log("Order confirmation email sent.");
+    }).catch((mailError) => {
+        console.log("Order confirmation email error:", mailError.message);
     });
 
-    console.log("Order confirmation email sent.");
-} catch (mailError) {
-    console.log("Email Error:", mailError.message);
-}
         await userModel.findByIdAndUpdate(userId, { cartData: {} })
 
         res.json({ success: true, message: "Order Placed" })

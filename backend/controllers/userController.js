@@ -3,7 +3,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import validator from "validator";
 import crypto from "crypto";
-import transporter from "../config/mail.js";
+import { sendMail } from "../config/mail.js";
 
 
 
@@ -101,8 +101,6 @@ const forgotPassword = async (req, res) => {
         const { email } = req.body;
 
         const user = await userModel.findOne({ email });
-        console.log("Email received:", email);
-console.log("User found:", user);
 
         // Don't reveal whether the email exists
         if (!user) {
@@ -121,11 +119,14 @@ console.log("User found:", user);
         await user.save();
 
         // Create reset link
-        const resetLink = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
+        const frontendUrl = (process.env.FRONTEND_URL || req.headers.origin || "").replace(/\/$/, "");
+        if (!frontendUrl) {
+            throw new Error("Frontend URL is not configured");
+        }
+        const resetLink = `${frontendUrl}/reset-password/${resetToken}`;
 
         // Send email
-        await transporter.sendMail({
-            from: process.env.EMAIL_USER,
+        await sendMail({
             to: user.email,
             subject: "Reset Your Password | Shri Balaji Foods",
             html: `
@@ -163,11 +164,11 @@ console.log("User found:", user);
         });
 
     } catch (error) {
-        console.log(error);
+        console.log("Password reset email error:", error.message);
 
         return res.json({
             success: false,
-            message: error.message
+            message: "Unable to send password reset email right now. Please try again in a few minutes."
         });
     }
 };
