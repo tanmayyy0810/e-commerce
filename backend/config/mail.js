@@ -2,20 +2,21 @@ import nodemailer from "nodemailer";
 
 const emailUser = (process.env.EMAIL_USER || "").trim();
 const emailPass = (process.env.EMAIL_PASS || "").replace(/\s/g, "");
-const smtpPort = Number(process.env.SMTP_PORT || 465);
+const smtpPort = Number(process.env.SMTP_PORT || 587);
 
 const transporter = nodemailer.createTransport({
     host: process.env.SMTP_HOST || "smtp.gmail.com",
     port: smtpPort,
     secure: smtpPort === 465,
+    requireTLS: smtpPort !== 465,
     family: 4,
     auth: {
         user: emailUser,
         pass: emailPass
     },
-    connectionTimeout: 10000,
-    greetingTimeout: 10000,
-    socketTimeout: 15000
+    connectionTimeout: 7000,
+    greetingTimeout: 7000,
+    socketTimeout: 10000
 });
 
 const sendMail = async (mailOptions) => {
