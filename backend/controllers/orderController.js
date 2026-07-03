@@ -49,6 +49,11 @@ const placeOrder = async (req, res) => {
 
         console.log("EMAIL_USER =", process.env.EMAIL_USER);
         try {
+              console.log("Trying to connect to Gmail SMTP...");
+
+    await transporter.verify();
+
+    console.log("SMTP Verified Successfully");
     await transporter.sendMail({
         from: process.env.EMAIL_USER,
         to: address.email,
