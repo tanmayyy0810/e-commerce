@@ -54,7 +54,7 @@ const placeOrder = async (req, res) => {
     await transporter.verify();
 
     console.log("SMTP Verified Successfully");
-    await transporter.sendMail({
+    transporter.sendMail({
         from: process.env.EMAIL_USER,
         to: address.email,
         subject: "Order Confirmation | Shri Balaji Foods",
