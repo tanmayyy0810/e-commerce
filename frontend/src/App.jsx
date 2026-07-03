@@ -25,6 +25,8 @@ import AnnouncementBar from './components/AnnouncementBar'
 import SplashScreen from './components/SplashScreen'
 import 'react-toastify/dist/ReactToastify.css';
 import Profile from "./pages/Profile";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 
 
 
@@ -68,6 +70,8 @@ useEffect(() => {
         <Route path='/refund-cancellation-policy' element={<RefundPolicy/>}/>
         <Route path='/terms-conditions' element={<TermsCondi/>}/>
         <Route path="/profile" element={<Profile />} />
+        <Route path="/forgot-password" element={<ForgotPassword />}/>
+        <Route path="/reset-password/:token" element={<ResetPassword />}/>
 
 
       </Routes>

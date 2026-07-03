@@ -2,6 +2,8 @@ import userModel from "../models/userModel.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import validator from "validator";
+import crypto from "crypto";
+import transporter from "../config/mail.js";
 
 
 
@@ -94,6 +96,142 @@ const adminLogin = async (req, res) => {
 
 }
 
+const forgotPassword = async (req, res) => {
+    try {
+        const { email } = req.body;
+
+        const user = await userModel.findOne({ email });
+        console.log("Email received:", email);
+console.log("User found:", user);
+
+        // Don't reveal whether the email exists
+        if (!user) {
+            return res.json({
+                success: true,
+                message: "If an account exists, a password reset link has been sent."
+            });
+        }
+
+        // Generate token
+        const resetToken = crypto.randomBytes(32).toString("hex");
+
+        user.resetPasswordToken = resetToken;
+        user.resetPasswordExpires = Date.now() + 15 * 60 * 1000;
+
+        await user.save();
+
+        // Create reset link
+        const resetLink = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
+
+        // Send email
+        await transporter.sendMail({
+            from: process.env.EMAIL_USER,
+            to: user.email,
+            subject: "Reset Your Password | Shri Balaji Foods",
+            html: `
+                <div style="font-family:Arial,sans-serif;max-width:600px;margin:auto;">
+                    <h2>Password Reset Request</h2>
+
+                    <p>Hello <b>${user.name}</b>,</p>
+
+                    <p>We received a request to reset your password.</p>
+
+                    <p>
+                        <a href="${resetLink}"
+                           style="display:inline-block;background:#198754;color:#fff;padding:12px 24px;border-radius:6px;text-decoration:none;">
+                            Reset Password
+                        </a>
+                    </p>
+
+                    <p>Or copy this link:</p>
+
+                    <p>${resetLink}</p>
+
+                    <hr>
+
+                    <p>This link expires in <b>15 minutes</b>.</p>
+
+                    <p>If you didn't request this, simply ignore this email.</p>
+
+                </div>
+            `
+        });
+
+        return res.json({
+            success: true,
+            message: "Password reset link sent successfully."
+        });
+
+    } catch (error) {
+        console.log(error);
+
+        return res.json({
+            success: false,
+            message: error.message
+        });
+    }
+};
+
+//reset password route
+const resetPassword = async (req, res) => {
+    try {
+        const { token, password } = req.body;
+
+        // Find user with this reset token
+        const user = await userModel.findOne({
+            resetPasswordToken: token
+        });
+
+        if (!user) {
+            return res.json({
+                success: false,
+                message: "Invalid or expired reset link."
+            });
+        }
+
+        // Check expiry
+        if (user.resetPasswordExpires < Date.now()) {
+            return res.json({
+                success: false,
+                message: "Reset link has expired."
+            });
+        }
+
+        // Validate password
+        if (password.length < 8) {
+            return res.json({
+                success: false,
+                message: "Password must be at least 8 characters."
+            });
+        }
+
+        // Hash password
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(password, salt);
+
+        // Save new password
+        user.password = hashedPassword;
+
+        // Clear reset fields
+        user.resetPasswordToken = "";
+        user.resetPasswordExpires = null;
+
+        await user.save();
+
+        res.json({
+            success: true,
+            message: "Password reset successfully."
+        });
+
+    } catch (error) {
+        console.log(error);
+
+        res.json({
+            success: false,
+            message: error.message
+        });
+    }
+};
 
 //route for Delivery login
 const deliveryLogin = async (req, res) => {
@@ -141,4 +279,4 @@ const getProfile = async (req, res) => {
     }
 };
 
-export { loginUser, registerUser, adminLogin, getProfile , deliveryLogin }
+export { loginUser, registerUser, adminLogin, getProfile , deliveryLogin, forgotPassword, resetPassword }
