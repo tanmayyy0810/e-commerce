@@ -46,6 +46,8 @@ const placeOrder = async (req, res) => {
         const newOrder = new orderModel(orderData)
         await newOrder.save()
         await sendTelegramMessage(orderNotification(newOrder));
+
+        console.log("EMAIL_USER =", process.env.EMAIL_USER);
         try {
     await transporter.sendMail({
         from: process.env.EMAIL_USER,
